@@ -15196,7 +15196,7 @@ const HOSPITAL_DRIVE_LINKS = {
   "37": "https://drive.google.com/drive/folders/1CuTxiCC7patk7ltcwdRtjEnyBZPYpkaS"
 };
 
-const PRIMARY_STORAGE_KEY = 'SEDENA_CALENDARIO_2026_V15_LOCAL_FIRST';
+const PRIMARY_STORAGE_KEY = 'SEDENA_CALENDARIO_2026_V16_LOCAL_FIRST';
 
 const DEFAULT_STATE = {
   engineers: [{"id": "sophia", "name": "Ing. Sophia López Ramírez", "short": "Sophia López Ramírez", "role": "Sede Fija CDMX (Constituyentes)", "color": "#FCE4EC", "hospitals": 1, "equipos": 68}, {"id": "axel", "name": "Ing. Axel Evangelista Salinas", "short": "Axel Evangelista Salinas", "role": "CDMX, Veracruz & Monterrey", "color": "#FEE2E2", "hospitals": 7, "equipos": 24}, {"id": "ramos", "name": "Ing. Rogelio Ramos Centeno", "short": "Rogelio Ramos Centeno", "role": "Jalisco, Sinaloa, Sonora & Península BC", "color": "#FEF3C7", "hospitals": 7, "equipos": 14}, {"id": "jorge", "name": "Ing. Jose Jorge Olivares Velazquez", "short": "Jose Jorge Olivares Velazquez", "role": "Santa Lucía, Temamatla & Morelos/Gro", "color": "#E0F2FE", "hospitals": 5, "equipos": 10}, {"id": "angel", "name": "Ing. Ángel Rodríguez Zavala", "short": "Ángel Rodríguez Zavala", "role": "Bajío, Zacatecas, Durango, Chihuahua & Tamaulipas", "color": "#FEF9C3", "hospitals": 8, "equipos": 9}, {"id": "fer", "name": "Ing. Fernando Javier Michel Euan", "short": "Fernando Javier Michel Euan", "role": "Península de Yucatán, Tabasco & Chiapas", "color": "#DCFCE7", "hospitals": 4, "equipos": 8}, {"id": "romero", "name": "Ing. Jose Romero Najera", "short": "Jose Romero Najera", "role": "Oaxaca (H.M.Z. Ixcotel)", "color": "#F3E8FF", "hospitals": 1, "equipos": 5}, {"id": "nuevo", "name": "Ing. Nuevo", "short": "Ing. Nuevo", "role": "Edomex, CDMX Sur & Puebla", "color": "#FFE4E6", "hospitals": 4, "equipos": 5}],
@@ -15278,13 +15278,14 @@ function renderCalendar() {
 }
 
 function renderWeekBlock(table, weekNum, weekTitle) {
+  const daysInWeek = appState.days.filter(d => d.week === weekNum);
+
   const sep = document.createElement('tr');
   sep.className = 'week-separator';
   sep.innerHTML = `<th colspan="${daysInWeek.length + 2}">${weekTitle}</th>`;
   table.appendChild(sep);
 
   const headerRow = document.createElement('tr');
-  const daysInWeek = appState.days.filter(d => d.week === weekNum);
   let hHtml = '<th class="col-tech">Frente / Responsable</th>';
   daysInWeek.forEach(d => {
     hHtml += `<th class="col-day">${d.label}</th>`;
