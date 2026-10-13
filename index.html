@@ -3,6 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
   <title>Plan Operativo SEDENA 2026 | Medical Dimegar · Biomédica Comercial</title>
   <style>
     :root {
@@ -381,18 +385,52 @@
     }
     .card-meta { font-size: 10.5px; color: #475569; margin-top: 3px; }
     .card-meta-note { font-size: 10px; color: #B45309; font-style: italic; margin-top: 2px; }
+    
+    .cloud-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #0F5132;
+      background: #D1E7DD;
+      border: 1px solid #BADBCC;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-left: auto;
+    }
+    .cloud-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #198754;
+      display: inline-block;
+      box-shadow: 0 0 6px #198754;
+    }
+    .cloud-status-badge.syncing .cloud-dot {
+      background: #FFC107;
+      box-shadow: 0 0 6px #FFC107;
+    }
+    .cloud-status-badge.error .cloud-dot {
+      background: #DC3545;
+      box-shadow: 0 0 6px #DC3545;
+    }
+
     .card-obs {
-      font-size: 10px;
-      color: #854D0E;
-      background: #FEF9C3;
-      border-left: 2px solid #EAB308;
-      padding: 2px 5px;
-      border-radius: 3px;
-      margin-top: 3px;
-      line-height: 1.25;
+      font-size: 10.5px;
+      font-weight: 600;
+      color: #92400E;
+      background: #FEF3C7;
+      border: 1px solid #FCD34D;
+      border-left: 3px solid #D97706;
+      padding: 3px 6px;
+      border-radius: 4px;
+      margin-top: 4px;
+      line-height: 1.3;
       text-align: left;
       word-break: break-word;
       white-space: pre-wrap;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     }
 
 
@@ -1387,8 +1425,9 @@
       
       <!-- PANEL DE FILTRO POR INGENIERO PARA EL CALENDARIO -->
       <div class="cal-controls-card no-print">
-        <div class="cal-filter-pills-row">
-          <span class="pills-label">Filtrar por Ingeniero Responsable:</span>
+        <div class="cal-filter-pills-row" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <span class="pills-label">Filtrar por Ingeniero Responsable:</span>
           <div class="cal-pills-group" id="calFilterPills">
             <button class="dir-pill active" onclick="filterCalByEngineer('all', this)">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
@@ -1401,6 +1440,11 @@
             <button class="dir-pill pill-fer" onclick="filterCalByEngineer('fer', this)">Fernando Javier Michel Euan</button>
             <button class="dir-pill pill-romero" onclick="filterCalByEngineer('romero', this)">Jose Romero Najera</button>
             <button class="dir-pill pill-nuevo" onclick="filterCalByEngineer('nuevo', this)">Jose Paris Mendoza Cortes</button>
+          </div>
+          </div>
+          <div id="cloudSyncStatus" class="cloud-status-badge" title="Sincronización en vivo con Firebase">
+            <span class="cloud-dot"></span>
+            <span id="cloudStatusText">Conectado a la nube</span>
           </div>
         </div>
       </div>
@@ -13934,9 +13978,18 @@ function escapeHtml(str) {
   return d.innerHTML;
 }
 
+function updateCloudStatus(status, text) {
+  const badge = document.getElementById("cloudSyncStatus");
+  const label = document.getElementById("cloudStatusText");
+  if (!badge || !label) return;
+  badge.className = "cloud-status-badge " + (status || "");
+  label.innerText = text || "Conectado a la nube";
+}
+
 function initFirebase() {
   try {
     if (typeof firebase !== "undefined") {
+      updateCloudStatus("syncing", "Conectando...");
       if (!firebase.apps || !firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
       }
@@ -13950,18 +14003,22 @@ function initFirebase() {
           appState.schedule = Object.assign({}, appState.schedule, cloudData);
           saveToStorage();
           renderCalendar();
+          updateCloudStatus("", "Sincronizado en la nube");
         } else {
           // Si es la primera vez que se conecta la base de datos, sembrar el cronograma base
           if (appState && appState.schedule) {
             dbScheduleRef.set(appState.schedule).catch(e => console.warn("Firebase seed notice:", e));
           }
+          updateCloudStatus("", "Sincronizado en la nube");
         }
       }, (err) => {
         console.warn("Firebase sync offline / reglas:", err);
+        updateCloudStatus("error", "Sin conexión");
       });
     }
   } catch (err) {
     console.warn("Firebase init notice:", err);
+    updateCloudStatus("error", "Error de conexión");
   }
 }
 
