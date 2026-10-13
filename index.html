@@ -14387,6 +14387,7 @@ function closeEditModal() {
 
 function saveCellContent() {
   if (!currentEditingKey) return;
+  const keyToSync = currentEditingKey;
   const hospital = document.getElementById('modalHospital').value.trim();
   const eq = parseInt(document.getElementById('modalEq').value) || 0;
   const type = document.getElementById('modalType').value;
@@ -14394,15 +14395,15 @@ function saveCellContent() {
   const obs = document.getElementById('modalObs').value.trim();
 
   const entry = { hospital, eq, type, meta, obs };
-  appState.schedule[currentEditingKey] = entry;
+  appState.schedule[keyToSync] = entry;
   saveToStorage();
   renderCalendar();
   closeEditModal();
   showToast("Jornada actualizada correctamente");
 
   // Sincronizar celda en Firebase en tiempo real
-  if (dbScheduleRef) {
-    dbScheduleRef.child(currentEditingKey).set(entry).catch(err => {
+  if (dbScheduleRef && keyToSync) {
+    dbScheduleRef.child(keyToSync).set(entry).catch(err => {
       console.warn("Error enviando actualización a Firebase:", err);
     });
   }
@@ -14410,16 +14411,17 @@ function saveCellContent() {
 
 function deleteCellContent() {
   if (!currentEditingKey) return;
+  const keyToSync = currentEditingKey;
   const entry = { hospital: 'Disponible', eq: 0, type: 'buffer', meta: '', obs: '' };
-  appState.schedule[currentEditingKey] = entry;
+  appState.schedule[keyToSync] = entry;
   saveToStorage();
   renderCalendar();
   closeEditModal();
   showToast("Jornada restablecida a disponible");
 
   // Sincronizar restablecimiento en Firebase en tiempo real
-  if (dbScheduleRef) {
-    dbScheduleRef.child(currentEditingKey).set(entry).catch(err => {
+  if (dbScheduleRef && keyToSync) {
+    dbScheduleRef.child(keyToSync).set(entry).catch(err => {
       console.warn("Error enviando restablecimiento a Firebase:", err);
     });
   }
