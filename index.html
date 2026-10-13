@@ -13965,7 +13965,7 @@ const firebaseConfig = {
   projectId: "sedana-calendario",
   storageBucket: "sedana-calendario.firebasestorage.app",
   messagingSenderId: "504623789128",
-  appId: "1:504623789128:web:fad77c56a3fd0a5641147d"
+  appId: "1:504623789128:web:3aba1953e7fd207041147d"
 };
 
 let db = null;
@@ -14393,7 +14393,8 @@ function saveCellContent() {
   const meta = document.getElementById('modalMeta').value.trim();
   const obs = document.getElementById('modalObs').value.trim();
 
-  appState.schedule[currentEditingKey] = { hospital, eq, type, meta, obs };
+  const entry = { hospital, eq, type, meta, obs };
+  appState.schedule[currentEditingKey] = entry;
   saveToStorage();
   renderCalendar();
   closeEditModal();
@@ -14409,7 +14410,8 @@ function saveCellContent() {
 
 function deleteCellContent() {
   if (!currentEditingKey) return;
-  appState.schedule[currentEditingKey] = { hospital: 'Disponible', eq: 0, type: 'buffer', meta: '', obs: '' };
+  const entry = { hospital: 'Disponible', eq: 0, type: 'buffer', meta: '', obs: '' };
+  appState.schedule[currentEditingKey] = entry;
   saveToStorage();
   renderCalendar();
   closeEditModal();
